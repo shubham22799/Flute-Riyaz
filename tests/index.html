@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>FPA — unit tests</title>
+<!-- The app stylesheet is loaded so the DOM-contract tests can verify the
+     real cascade (e.g. that `hidden` is not defeated by `.modal{display:flex}`).
+     The inline <style> below comes later, so the test page keeps its own look. -->
+<link rel="stylesheet" href="../css/styles.css?v=22" />
+<style>
+  body { background: #0c1014; color: #e6edf5; font: 13px/1.5 ui-monospace, Menlo, monospace; margin: 0; padding: 20px; }
+  h1 { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 16px; }
+  pre { white-space: pre-wrap; background: #151b23; border: 1px solid #253040; border-radius: 10px; padding: 16px; }
+  .summary { font-family: -apple-system, sans-serif; font-weight: 700; margin-top: 14px; padding: 10px 14px; border-radius: 9px; }
+  .ok { background: rgba(52,211,153,0.14); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.4); }
+  .bad { background: rgba(248,113,113,0.14); color: #fca5a5; border: 1px solid rgba(248,113,113,0.4); }
+</style>
+</head>
+<body>
+<h1>Flute Practice Analyzer — unit tests</h1>
+<div id="summary" class="summary">Running…</div>
+<pre id="out"></pre>
+
+<script src="../js/config.js?v=22"></script>
+<script src="../js/notes.js?v=22"></script>
+<script src="../js/sargam.js?v=22"></script>
+<script src="../js/pitch.js?v=22"></script>
+<script src="../js/sa.js?v=22"></script>
+<script src="../js/tracker.js?v=22"></script>
+<script src="../js/stats.js?v=22"></script>
+<script src="../js/simulation.js?v=22"></script>
+<script src="../js/history.js?v=22"></script>
+<script src="../js/timeline.js?v=22"></script>
+<script src="../js/ui.js?v=22"></script>
+<script src="suite.js?v=22"></script>
+<script>
+(function () {
+  "use strict";
+  var result = window.FPA_TEST_SUITE.run(window.FPA);
+  var out = document.getElementById("out");
+  var summary = document.getElementById("summary");
+
+  out.textContent = result.lines.join("\n");
+  summary.textContent = result.passed + " passed, " + result.failed + " failed";
+  summary.className = "summary " + (result.failed ? "bad" : "ok");
+  if (result.failed) {
+    out.textContent += "\n\nFAILURES\n" + result.failures.map(function (f) {
+      return "  \u2022 " + f.name + "\n    " + f.message;
+    }).join("\n");
+  }
+
+  /* Machine-readable hook for automated inspection. */
+  window.__FPA_TEST_RESULTS__ = {
+    passed: result.passed,
+    failed: result.failed,
+    total: result.total,
+    failures: result.failures
+  };
+  document.title = (result.failed ? "\u2717 " : "\u2713 ") + result.passed + "/" + result.total + " tests";
+})();
+</script>
+</body>
+</html>

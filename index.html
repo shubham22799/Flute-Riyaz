@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" data-app="flute-practice-analyzer">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Flute Practice Analyzer — Bansuri Riyaz Companion</title>
+<meta name="description" content="Real-time microphone-based pitch, Sa discovery, Sargam mapping and sustain-duration analysis for Indian bamboo flute (Bansuri) free practice." />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AB%88%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/styles.css?v=22" />
+</head>
+<body>
+
+<!-- ══════════════════════════ HEADER ══════════════════════════ -->
+<header class="app-header">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🪈</div>
+    <div class="brand-text">
+      <h1>Flute Practice Analyzer</h1>
+      <p class="tagline">Bansuri riyaz companion &mdash; pitch, Sa &amp; sargam, sustain timing</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="modeBadge" class="badge badge-none" title="Source of the values shown in the app">NO INPUT</span>
+    <button id="settingsBtn" class="btn btn-ghost" type="button" title="Detector &amp; display settings">&#9881; Settings</button>
+  </div>
+</header>
+
+<!-- ══════════════════════ BANNERS / ERRORS ══════════════════════ -->
+<div id="banners" class="banners" role="status" aria-live="polite"></div>
+
+<!-- ══════════════════════ STATUS BAR ══════════════════════ -->
+<section class="status-bar" aria-live="polite">
+  <span id="statusDot" class="status-dot state-idle" aria-hidden="true"></span>
+  <div class="status-main">
+    <strong id="statusText">Microphone not started</strong>
+    <span id="statusDetail">Press <em>Start microphone</em> to begin live analysis.</span>
+  </div>
+  <div class="status-side">
+    <span id="sessionBadge" class="badge badge-none badge-sm">SESSION IDLE</span>
+    <span id="clockBadge" class="clock-badge" title="Session elapsed time (paused time excluded)">00:00</span>
+  </div>
+</section>
+
+<main class="layout">
+
+  <!-- ════════ ROW 1 · one-time setup — My Sa + Live practice ════════ -->
+  <div class="dash-row dash-setup">
+
+    <!-- ───────────── Sa discovery card ───────────── -->
+    <section class="card sa-card" id="saCard" aria-label="Sa discovery">
+      <div class="card-head">
+        <h2>My Sa (tonic)</h2>
+        <div class="card-head-actions">
+          <span id="saStateChip" class="chip chip-idle">not set</span>
+          <button class="card-toggle" data-collapse="1" type="button" aria-expanded="true" aria-controls="saCardBody" title="Collapse My Sa">&#9652;</button>
+        </div>
+      </div>
+
+      <div class="card-body" id="saCardBody">
+      <!-- Unconfirmed: candidate + recent list -->
+      <div id="saFinding" class="sa-finding">
+        <p id="saFindingText" class="muted">Play the pitch you use as <strong>Sa</strong> and hold it steady. The app will propose it — you decide.</p>
+
+        <div id="saCandidateBox" class="sa-candidate" hidden>
+          <div class="sa-cand-label">Proposed Sa candidate</div>
+          <div class="sa-cand-row">
+            <span id="saCandNote" class="sa-cand-note">—</span>
+            <span id="saCandFreq" class="sa-cand-freq">— Hz</span>
+            <span id="saCandMeta" class="sa-cand-meta"></span>
+          </div>
+          <div class="sa-cand-actions">
+            <button id="confirmSaBtn" class="btn btn-primary" type="button">Set this pitch as my Sa</button>
+            <button id="dismissCandBtn" class="btn btn-ghost btn-sm" type="button">Keep listening</button>
+          </div>
+        </div>
+
+        <div id="saRecentWrap" class="sa-recent-wrap" hidden>
+          <div class="sa-recent-label">…or pick a recent stable detection:</div>
+          <div id="saRecentList" class="sa-recent-list"></div>
+        </div>
+
+        <div id="saManualWrap" class="sa-manual-wrap">
+          <label class="sa-manual-label" for="saManualSelect">…or choose the pitch yourself:</label>
+          <div class="sa-manual-row">
+            <select id="saManualSelect" class="select sa-manual-select"></select>
+            <button id="setManualSaBtn" class="btn btn-outline btn-sm" type="button" disabled>Set as Sa</button>
+          </div>
+          <p class="fineprint">These are equal-tempered reference pitches for your A4 setting — a choice you declare, not a measurement of your flute. For your flute's real tuning, play and hold the note instead. Changing Sa never deletes history.</p>
+        </div>
+      </div>
+
+      <!-- Confirmed -->
+      <div id="saConfirmed" class="sa-confirmed" hidden>
+        <div class="sa-conf-main">
+          <span id="saConfirmedNote" class="sa-conf-note">—</span>
+          <span id="saConfirmedFreq" class="sa-conf-freq">— Hz</span>
+        </div>
+        <div id="saConfirmedMeta" class="sa-conf-meta muted"></div>
+        <div class="sa-conf-actions">
+          <button id="changeSaBtn" class="btn btn-ghost btn-sm" type="button">Change Sa</button>
+          <button id="clearSaBtn" class="btn btn-ghost btn-sm btn-danger-ghost" type="button">Clear</button>
+        </div>
+      </div>
+
+      <label class="check-row" title="Restore your Sa automatically next time (stored locally in this browser)">
+        <input type="checkbox" id="rememberSaChk" checked />
+        <span>Remember my Sa in this browser</span>
+      </label>
+      <p class="fineprint">Sa is a musical reference, not just a frequency: the app uses your confirmed pitch as the root for all sargam mapping. Changing Sa never deletes history.</p>
+      </div>
+    </section>
+
+    <!-- ───────────── Live practice card ───────────── -->
+    <section class="card session-card" aria-label="Live practice controls">
+      <div class="card-head">
+        <h2>Live practice</h2>
+        <div class="card-head-actions">
+          <button class="card-toggle" data-collapse="1" type="button" aria-expanded="true" aria-controls="liveCardBody" title="Collapse Live practice">&#9652;</button>
+        </div>
+      </div>
+
+      <div class="card-body" id="liveCardBody">
+      <div class="btn-row">
+        <button id="startMicBtn" class="btn btn-primary btn-block" type="button">&#9679; Start microphone</button>
+        <button id="stopMicBtn" class="btn btn-outline btn-block" type="button" hidden>Stop microphone</button>
+      </div>
+      <p id="micHelp" class="mic-help" hidden></p>
+
+      <div class="divider"><span>session</span></div>
+
+      <div class="btn-row">
+        <button id="startSessionBtn" class="btn btn-accent btn-block" type="button" disabled>&#9654; Start session</button>
+        <button id="pauseSessionBtn" class="btn btn-outline" type="button" hidden>Pause</button>
+        <button id="stopSessionBtn" class="btn btn-danger" type="button" hidden>Stop &amp; save</button>
+      </div>
+
+      <div class="quick-stats" aria-label="Session quick statistics">
+        <div class="qs"><span id="qsNotes" class="qs-value">0</span><span class="qs-label">notes</span></div>
+        <div class="qs"><span id="qsNoteTime" class="qs-value">0.0&#8239;s</span><span class="qs-label">note time</span></div>
+        <div class="qs"><span id="qsLongest" class="qs-value">0.0&#8239;s</span><span class="qs-label">longest</span></div>
+      </div>
+
+      <div class="divider"><span>demonstration</span></div>
+
+      <div class="btn-row sim-row" title="Simulated readings for interface demonstration — never presented as microphone measurements">
+        <button id="simStartBtn" class="btn btn-sim" type="button">&#9654; Run simulation</button>
+        <button id="simStopBtn" class="btn btn-outline" type="button" hidden>Stop simulation</button>
+      </div>
+      <p class="fineprint">Simulation generates fake notes to preview the interface. Simulated events are labeled and are not saved as real practice history.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════ ROW 2 · RIYAZ TIMELINE (full width) ══════════════════ -->
+  <section class="card timeline-card" aria-label="Riyaz timeline">
+    <div class="card-head">
+      <h2>Riyaz timeline</h2>
+      <div class="timeline-controls">
+        <span class="legend-item"><span class="legend-swatch sw-live"></span>live note</span>
+        <span class="legend-item"><span class="legend-swatch sw-done"></span>completed</span>
+        <span class="legend-item"><span class="legend-swatch sw-sim"></span>simulated</span>
+        <span class="timeline-window-label" id="timelineWindowLabel">last 30&#8239;s</span>
+      </div>
+    </div>
+    <div class="timeline-wrap">
+      <canvas id="timelineCanvas" height="240"></canvas>
+      <div id="timelineEmpty" class="timeline-empty">Note events appear here as you play. Position = start time, width = sustained duration, row = swara.</div>
+      <div id="timelineTooltip" class="timeline-tooltip" hidden></div>
+    </div>
+    <p class="fineprint">Rows are swara degrees counted up from your Sa (top row = Sa); notes from different octaves share a row, and the register is written on the block. Before a Sa is set the rows show plain note names instead. Durations come from recorded note-event timestamps, never from animation frames. Timeline shows note events (not breaths) — a sustained block is an estimated sounding duration.</p>
+  </section>
+
+  <!-- ══════ ROW 3 · MONITORING — current note + session statistics ══════ -->
+  <div class="dash-row dash-monitor">
+
+    <section class="card pitch-card" id="pitchCard" aria-label="Current pitch">
+      <div class="card-head">
+        <h2>Current note</h2>
+        <span id="pitchQuality" class="quality" title="Pitch detection confidence">&#9679;&#9679;&#9679;&#9679;&#9679;</span>
+      </div>
+
+      <div class="pitch-hero">
+        <div class="pitch-western">
+          <div id="noteName" class="note-name">—</div>
+          <div class="note-sub">
+            <span id="noteFreq" class="note-freq">— Hz</span>
+            <span class="dot-sep">·</span>
+            <span id="noteRef" class="note-ref">ref — Hz</span>
+          </div>
+        </div>
+
+        <div class="pitch-sargam">
+          <div id="swaraName" class="swara-name">Sargam pending</div>
+          <div id="swaraRegister" class="swara-register">set Sa first</div>
+          <div id="swaraOffset" class="swara-offset">&nbsp;</div>
+        </div>
+      </div>
+
+      <!-- cents deviation meter -->
+      <div class="cents-row" title="Tuning deviation from the nearest equal-tempered note">
+        <span class="cents-label">−50&#8239;¢</span>
+        <div class="cents-track">
+          <div class="cents-center"></div>
+          <div id="centsNeedle" class="cents-needle" hidden></div>
+        </div>
+        <span class="cents-label">+50&#8239;¢</span>
+        <span id="centsValue" class="cents-value">—</span>
+      </div>
+
+      <div class="pitch-foot">
+        <div class="foot-item">
+          <span class="foot-label">Sustained</span>
+          <span id="sustainTime" class="foot-value">0.0&#8239;s</span>
+        </div>
+        <div class="foot-item">
+          <span class="foot-label">Stability</span>
+          <span id="stabilityValue" class="foot-value">—</span>
+        </div>
+        <div class="foot-item">
+          <span class="foot-label">Level</span>
+          <span id="levelValue" class="foot-value">—</span>
+        </div>
+      </div>
+      <p id="pitchHint" class="pitch-hint">Start the microphone and play any note — no flute key selection needed.</p>
+    </section>
+
+    <section class="card session-stats-card" aria-label="Session statistics">
+      <div class="card-head">
+        <h2>Session statistics</h2>
+        <span id="statsScope" class="chip chip-idle">no session</span>
+      </div>
+      <div class="stats-split">
+        <div class="stats-col">
+          <div class="stats-grid" id="statsGrid">
+            <div class="stat"><span class="stat-value" id="stSession">00:00</span><span class="stat-label">Practice time</span></div>
+            <div class="stat"><span class="stat-value" id="stNoteTime">0.0&#8239;s</span><span class="stat-label">Detected note time</span></div>
+            <div class="stat"><span class="stat-value" id="stCount">0</span><span class="stat-label">Note events</span></div>
+            <div class="stat"><span class="stat-value" id="stLongest">0.0&#8239;s</span><span class="stat-label">Longest note</span></div>
+            <div class="stat"><span class="stat-value" id="stAvg">0.0&#8239;s</span><span class="stat-label">Average note</span></div>
+            <div class="stat"><span class="stat-value" id="stMedian">0.0&#8239;s</span><span class="stat-label">Median note</span></div>
+          </div>
+          <div class="dist-wrap">
+            <div class="mini-label">Note duration distribution</div>
+            <div id="distBars" class="dist-bars"></div>
+          </div>
+        </div>
+        <div class="stats-col">
+          <div class="mini-label">Swara usage <span class="denom" id="swaraDenom">(share of detected note time)</span></div>
+          <div class="swara-table-wrap">
+            <table class="swara-table">
+              <thead><tr><th>Swara</th><th title="Western note name (pitch class); hover a cell to see the octaves">Western</th><th>Notes</th><th>Time</th><th title="Longest single note of this swara">Max</th><th>Share</th></tr></thead>
+              <tbody id="swaraTableBody">
+                <tr><td colspan="6" class="muted center">No notes recorded yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════ ROW 4 · PRACTICE HISTORY (full width) ══════════════════ -->
+  <section class="card history-card" aria-label="Practice history">
+    <div class="card-head">
+      <h2>Practice history</h2>
+      <div class="card-head-actions">
+        <button id="exportAllBtn" class="btn btn-ghost btn-sm" type="button" disabled>Export all (JSON)</button>
+        <button id="clearHistoryBtn" class="btn btn-ghost btn-sm btn-danger-ghost" type="button" disabled>Clear history</button>
+        <button class="card-toggle" data-collapse="1" type="button" aria-expanded="true" aria-controls="historyCardBody" title="Collapse Practice history">&#9652;</button>
+      </div>
+    </div>
+    <div class="card-body" id="historyCardBody">
+    <div id="historyList" class="history-list">
+      <p class="muted center">No saved sessions yet.</p>
+    </div>
+    <p id="storageNote" class="fineprint" hidden></p>
+    </div>
+  </section>
+</main>
+
+<!-- ══════════════════ SETTINGS MODAL ══════════════════ -->
+<div id="settingsModal" class="modal" hidden>
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <h3 id="settingsTitle">Detector &amp; display settings</h3>
+      <button class="btn btn-ghost btn-sm" data-close="1" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-grid">
+        <label class="field">
+          <span>Lowest pitch (Hz)</span>
+          <input type="number" id="setMinFreq" min="60" max="400" step="1" />
+          <small>Lower = bass registers. Range must not be universal-fixed; tune to your flute.</small>
+        </label>
+        <label class="field">
+          <span>Highest pitch (Hz)</span>
+          <input type="number" id="setMaxFreq" min="400" max="2500" step="1" />
+          <small>Higher = taar saptak / high overblown notes.</small>
+        </label>
+        <label class="field">
+          <span>Input sensitivity — noise gate</span>
+          <input type="range" id="setSensitivity" min="1" max="100" step="1" />
+          <small>Lower values accept quieter playing; higher values reject more background noise. <em id="setSensitivityVal"></em></small>
+        </label>
+        <label class="field">
+          <span>Minimum pitch confidence</span>
+          <input type="range" id="setConfidence" min="50" max="99" step="1" />
+          <small>Rejects uncertain periodicity estimates. <em id="setConfidenceVal"></em></small>
+        </label>
+        <label class="field">
+          <span>Note onset time (ms)</span>
+          <input type="number" id="setOnset" min="40" max="600" step="10" />
+          <small>A pitch must hold this long before a note event starts.</small>
+        </label>
+        <label class="field">
+          <span>Release grace period (ms)</span>
+          <input type="number" id="setGrace" min="50" max="1500" step="50" />
+          <small>Short dropouts and brief wrong-pitch flickers don't split a sustained note. Within this window the note stays connected.</small>
+        </label>
+        <label class="field">
+          <span>Reference tuning A4 (Hz)</span>
+          <input type="number" id="setA4" min="415" max="466" step="0.1" />
+          <small>Western note names use this reference (default 440).</small>
+        </label>
+        <label class="field">
+          <span>Timeline window (seconds)</span>
+          <input type="number" id="setWindow" min="10" max="120" step="5" />
+          <small>Scrolling display window only — stored history is not limited by it.</small>
+        </label>
+      </div>
+      <p class="fineprint">Thresholds are testing parameters, not universal constants. Changes apply to live detection immediately and are stored in this browser.</p>
+    </div>
+    <div class="modal-foot">
+      <button id="settingsResetBtn" class="btn btn-ghost" type="button">Restore defaults</button>
+      <div class="spacer"></div>
+      <button class="btn btn-outline" data-close="1" type="button">Cancel</button>
+      <button id="settingsSaveBtn" class="btn btn-primary" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SESSION DETAIL MODAL ══════════════════ -->
+<div id="sessionModal" class="modal" hidden>
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel modal-wide" role="dialog" aria-modal="true" aria-labelledby="sessionTitle">
+    <div class="modal-head">
+      <h3 id="sessionTitle">Session detail</h3>
+      <button class="btn btn-ghost btn-sm" data-close="1" type="button">✕</button>
+    </div>
+    <div class="modal-body" id="sessionDetail"></div>
+    <div class="modal-foot">
+      <button id="sessionExportJsonBtn" class="btn btn-ghost" type="button">Export JSON</button>
+      <button id="sessionExportCsvBtn" class="btn btn-ghost" type="button">Export CSV</button>
+      <div class="spacer"></div>
+      <button id="sessionDeleteBtn" class="btn btn-danger-ghost" type="button">Delete session</button>
+      <button class="btn btn-outline" data-close="1" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<footer class="app-footer">
+  <div class="footer-grid">
+    <div>
+      <h4>Sargam notation used here</h4>
+      <p>
+        <strong>Sa Re Ga Ma Pa Dha Ni</strong> = shuddha · prefix <strong>k</strong> = komal (<em>kRe kGa kDha kNi</em>) · prefix <strong>t</strong> = tivra (<em>tMa</em>).<br />
+        Octave: <strong>&#8217;Sa</strong> = mandra saptak · <strong>Sa</strong> = madhya saptak · <strong>Sa&#8217;</strong> = taar saptak.<br />
+        Western notes use sharps with A4 = 440&#8239;Hz by default (configurable).
+      </p>
+    </div>
+    <div>
+      <h4>Honesty notes</h4>
+      <p>
+        &bull; Detected durations are <em>estimates derived from audio events</em>, not physiological breath measurements.<br />
+        &bull; Sargam mapping is equal-tempered relative to your confirmed Sa — a practical starting point, not a claim about raga intonation.<br />
+        &bull; <strong>LIVE MICROPHONE</strong> and <strong>SIMULATION</strong> are always visibly distinguished; mic failure never silently swaps in fake readings.<br />
+        &bull; All data stays in this browser (localStorage) — no account, no cloud.
+      </p>
+    </div>
+  </div>
+  <p class="footer-tip">Tip: serve this folder over <code>http://localhost</code> (e.g. <code>python3 -m http.server</code>) — browsers restrict microphone access on <code>file://</code> pages.</p>
+</footer>
+
+<!-- ══════════════════ SCRIPTS (order = module dependency) ══════════════════ -->
+<script src="js/config.js?v=22"></script>
+<script src="js/notes.js?v=22"></script>
+<script src="js/sargam.js?v=22"></script>
+<script src="js/pitch.js?v=22"></script>
+<script src="js/audio.js?v=22"></script>
+<script src="js/sa.js?v=22"></script>
+<script src="js/tracker.js?v=22"></script>
+<script src="js/stats.js?v=22"></script>
+<script src="js/history.js?v=22"></script>
+<script src="js/timeline.js?v=22"></script>
+<script src="js/simulation.js?v=22"></script>
+<script src="js/ui.js?v=22"></script>
+<script src="js/app.js?v=22"></script>
+</body>
+</html>
