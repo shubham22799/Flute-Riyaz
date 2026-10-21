@@ -7,7 +7,14 @@
 <meta name="description" content="Real-time microphone-based pitch, Sa discovery, Sargam mapping and sustain-duration analysis for Indian bamboo flute (Bansuri) free practice." />
 <meta name="color-scheme" content="dark" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AB%88%3C/text%3E%3C/svg%3E" />
-<link rel="stylesheet" href="css/styles.css?v=22" />
+<!-- Phone friendly: installable to the home screen and opens without browser chrome. -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Flute Riyaz" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="stylesheet" href="css/styles.css?v=23" />
 </head>
 <body>
 
@@ -140,14 +147,6 @@
         <div class="qs"><span id="qsNoteTime" class="qs-value">0.0&#8239;s</span><span class="qs-label">note time</span></div>
         <div class="qs"><span id="qsLongest" class="qs-value">0.0&#8239;s</span><span class="qs-label">longest</span></div>
       </div>
-
-      <div class="divider"><span>demonstration</span></div>
-
-      <div class="btn-row sim-row" title="Simulated readings for interface demonstration — never presented as microphone measurements">
-        <button id="simStartBtn" class="btn btn-sim" type="button">&#9654; Run simulation</button>
-        <button id="simStopBtn" class="btn btn-outline" type="button" hidden>Stop simulation</button>
-      </div>
-      <p class="fineprint">Simulation generates fake notes to preview the interface. Simulated events are labeled and are not saved as real practice history.</p>
       </div>
     </section>
   </div>
@@ -159,7 +158,6 @@
       <div class="timeline-controls">
         <span class="legend-item"><span class="legend-swatch sw-live"></span>live note</span>
         <span class="legend-item"><span class="legend-swatch sw-done"></span>completed</span>
-        <span class="legend-item"><span class="legend-swatch sw-sim"></span>simulated</span>
         <span class="timeline-window-label" id="timelineWindowLabel">last 30&#8239;s</span>
       </div>
     </div>
@@ -375,7 +373,7 @@
       <p>
         &bull; Detected durations are <em>estimates derived from audio events</em>, not physiological breath measurements.<br />
         &bull; Sargam mapping is equal-tempered relative to your confirmed Sa — a practical starting point, not a claim about raga intonation.<br />
-        &bull; <strong>LIVE MICROPHONE</strong> and <strong>SIMULATION</strong> are always visibly distinguished; mic failure never silently swaps in fake readings.<br />
+        &bull; Every number comes from the microphone; the app never substitutes invented readings when the mic fails.<br />
         &bull; All data stays in this browser (localStorage) — no account, no cloud.
       </p>
     </div>
@@ -384,18 +382,18 @@
 </footer>
 
 <!-- ══════════════════ SCRIPTS (order = module dependency) ══════════════════ -->
-<script src="js/config.js?v=22"></script>
-<script src="js/notes.js?v=22"></script>
-<script src="js/sargam.js?v=22"></script>
-<script src="js/pitch.js?v=22"></script>
-<script src="js/audio.js?v=22"></script>
-<script src="js/sa.js?v=22"></script>
-<script src="js/tracker.js?v=22"></script>
-<script src="js/stats.js?v=22"></script>
-<script src="js/history.js?v=22"></script>
-<script src="js/timeline.js?v=22"></script>
-<script src="js/simulation.js?v=22"></script>
-<script src="js/ui.js?v=22"></script>
-<script src="js/app.js?v=22"></script>
+<script src="js/config.js?v=23"></script>
+<script src="js/notes.js?v=23"></script>
+<script src="js/sargam.js?v=23"></script>
+<script src="js/pitch.js?v=23"></script>
+<script src="js/audio.js?v=23"></script>
+<script src="js/sa.js?v=23"></script>
+<script src="js/tracker.js?v=23"></script>
+<script src="js/stats.js?v=23"></script>
+<script src="js/history.js?v=23"></script>
+<script src="js/timeline.js?v=23"></script>
+<script src="js/simulation.js?v=23"></script>
+<script src="js/ui.js?v=23"></script>
+<script src="js/app.js?v=23"></script>
 </body>
 </html>

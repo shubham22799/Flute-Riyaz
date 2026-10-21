@@ -135,19 +135,19 @@ than absolute pitches — the register (mandra / madhya / taar) is written on th
 block and in the tooltip. Until you confirm a Sa, the rows are labelled with
 plain note names instead.
 
-### Step 3b — Not playing? Try it anyway
+### Step 3b — No simulation mode
 
-Click **▶ Run simulation** to generate fake notes and explore every part of the
-interface without touching your flute. Everything is labelled **SIMULATION**, and
-simulated notes are never saved as real practice. Click **Stop simulation** when
-done.
+There is no demo mode: every number the app shows comes from your microphone.
+That is a deliberate choice — a practice tool that can invent readings is a
+practice tool you cannot trust. If the microphone is blocked or silent, the app
+says so plainly instead of showing something plausible.
 
 ### Step 4 — Record a session
 
 When you are ready to keep a record, click **▶ Start session**.
 
-> **▶ Start session** stays greyed out until the microphone (or the simulation) is
-> running — the app never records without a live source.
+> **▶ Start session** stays greyed out until the microphone is running — the app
+> never records without a live source.
 
 - **Pause** suspends recording (the live display keeps working) — useful for
   talking, tuning, or a break.
@@ -315,7 +315,6 @@ that's the button to press.
 | **▶ Start session** | Begins recording note events |
 | **Pause** | Suspends recording; live display continues |
 | **Stop & save** | Ends the session and saves it if it has notes |
-| **▶ Run simulation** | Fake notes to explore the interface |
 | **Set this pitch as my Sa** | Confirms the proposed tonic |
 | **Keep listening** | Clears the current Sa evidence and keeps listening |
 | **…or choose the pitch yourself** | Dropdown of equal-tempered reference pitches — pick one and press **Set as Sa** |

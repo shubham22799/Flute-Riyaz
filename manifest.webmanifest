@@ -1,0 +1,15 @@
+{
+  "name": "Flute Practice Analyzer",
+  "short_name": "Flute Riyaz",
+  "description": "Microphone-based bansuri companion: live pitch, Sa discovery, sargam mapping and sustain timing.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0c1014",
+  "theme_color": "#0c1014",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

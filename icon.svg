@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Bansuri">
+  <rect width="512" height="512" rx="112" fill="#0c1014"/>
+  <rect x="40" y="40" width="432" height="432" rx="88" fill="none" stroke="#1b2530" stroke-width="4"/>
+  <g transform="rotate(-18 256 256)">
+    <rect x="52" y="234" width="408" height="44" rx="22" fill="#2dd4bf"/>
+    <rect x="52" y="234" width="408" height="12" rx="6" fill="#7ff0e2" opacity=".45"/>
+    <circle cx="140" cy="256" r="9" fill="#04211d"/>
+    <circle cx="188" cy="256" r="9" fill="#04211d"/>
+    <circle cx="236" cy="256" r="9" fill="#04211d"/>
+    <circle cx="284" cy="256" r="9" fill="#04211d"/>
+    <circle cx="332" cy="256" r="9" fill="#04211d"/>
+  </g>
+</svg>

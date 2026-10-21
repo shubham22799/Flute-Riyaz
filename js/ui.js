@@ -62,7 +62,7 @@
         "saConfirmedMeta", "changeSaBtn", "clearSaBtn", "rememberSaChk",
         "saManualWrap", "saManualSelect", "setManualSaBtn",
         "startMicBtn", "stopMicBtn", "micHelp", "startSessionBtn", "pauseSessionBtn",
-        "stopSessionBtn", "qsNotes", "qsNoteTime", "qsLongest", "simStartBtn", "simStopBtn",
+        "stopSessionBtn", "qsNotes", "qsNoteTime", "qsLongest",
         "statsScope", "stSession", "stNoteTime", "stCount", "stLongest", "stAvg", "stMedian",
         "distBars", "swaraTableBody", "swaraDenom",
         "timelineCanvas", "timelineEmpty", "timelineTooltip", "timelineWindowLabel",
@@ -80,8 +80,6 @@
       bind(el.startSessionBtn, h.onStartSession);
       bind(el.pauseSessionBtn, h.onPauseSession);
       bind(el.stopSessionBtn, h.onStopSession);
-      bind(el.simStartBtn, h.onSimStart);
-      bind(el.simStopBtn, h.onSimStop);
       bind(el.confirmSaBtn, h.onConfirmSa);
       bind(el.dismissCandBtn, h.onDismissCandidate);
       bind(el.changeSaBtn, h.onChangeSa);
@@ -207,11 +205,8 @@
       /* mic */
       el.startMicBtn.hidden = s.mic === "on";
       el.stopMicBtn.hidden = s.mic !== "on";
-      el.startMicBtn.disabled = s.simRunning || s.mic === "requesting";
+      el.startMicBtn.disabled = s.mic === "requesting";
       el.startMicBtn.textContent = s.mic === "requesting" ? "\u23F3 Waiting for permission…" : "\u25CF Start microphone";
-      el.simStartBtn.hidden = !!s.simRunning;
-      el.simStopBtn.hidden = !s.simRunning;
-      el.simStartBtn.disabled = s.mic === "on";
 
       /* session */
       var rec = s.session === "recording";
@@ -220,7 +215,7 @@
       el.pauseSessionBtn.hidden = !(rec || paused);
       el.stopSessionBtn.hidden = !(rec || paused);
       el.pauseSessionBtn.textContent = paused ? "\u25B6 Resume" : "\u23F8 Pause";
-      el.startSessionBtn.disabled = !(s.mic === "on" || s.simRunning);
+      el.startSessionBtn.disabled = !(s.mic === "on");
     },
 
     /* ─────────────────────── pitch card ─────────────────────── */

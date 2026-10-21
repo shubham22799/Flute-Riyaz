@@ -41,15 +41,23 @@ file server works.
 > Static servers send `Last-Modified`, and browsers happily reuse a cached script
 > until its URL changes.
 
-### Try it without a microphone
+### Use it on your phone
 
-Press **Run simulation**. It generates flute-like note frames that feed the *same*
-note-tracking, Sargam, statistics and timeline code as live audio, so you can
-explore the whole interface without playing. The only difference is that the pitch
-is generated mathematically instead of being measured from a microphone (and the
-confidence value is synthesised rather than observed). Simulated values are
-always labelled `SIMULATION`, and are never written into your real practice
-history.
+The app is a static page, so it runs from any web server — including GitHub
+Pages. Serve it over **https://** (or `http://localhost`): browsers only allow
+microphone access in a secure context, which is why opening `index.html` from
+disk usually fails with a permission error.
+
+On a phone: open the page, press **Start microphone** (the browser asks for
+permission once), then **Start session** to record. iOS Safari keeps the audio
+engine paused unless the microphone is started from that button press, which is
+why the app wakes the audio context inside the click handler and resumes it
+when you come back to the tab. The app can also be added to the home screen
+(it ships a web manifest and an icon) and then opens fullscreen.
+
+There is **no demo mode**: every value on screen is measured from your
+microphone. If the mic is blocked or silent, the app says so instead of
+showing something invented.
 
 ---
 
@@ -230,7 +238,7 @@ js/tracker.js         note-event lifecycle: onset, sustain, grace-period dropout
 js/stats.js           pure statistics (explicit denominators)
 js/history.js         localStorage persistence, session list, JSON/CSV export
 js/timeline.js        canvas timeline renderer + hover tooltip
-js/simulation.js      demo frame generator (testable state machine; supplies pitch directly)
+js/simulation.js      test-only frame generator (not reachable from the page)
 js/ui.js              all DOM rendering & wiring (never computes musical values)
 js/app.js             orchestrator: state machine, session clock, render loop
 tests/index.html      browser test runner
@@ -243,11 +251,11 @@ tests/suite.js        the shared test suite
 ```
 mic frames (audio.js) ──► pitch.js (YIN detection + smoother) ─┐
                                                                ├─► tracker.js (note events)
-simulated frames (simulation.js, pitch supplied directly) ─────┘          │
-                                                                          ├─► app.js state
-                                                                          ├─► ui.js display
-                                                                          ├─► timeline.js canvas
-                                                                          └─► stats.js ─► history.js (export)
+                                                               │            │
+                                                               │            ├─► app.js state
+                                                               │            ├─► ui.js display
+                                                               │            ├─► timeline.js canvas
+                                                               │            └─► stats.js ─► history.js (export)
 ```
 
 Modules attach to a single `FPA` namespace and are loaded as plain scripts (no
