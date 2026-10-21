@@ -432,7 +432,6 @@ code {
 .qs-value { font-family: var(--mono); font-size: 16px; font-weight: 650; }
 .qs-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-top: 1px; }
 
-.sim-row .btn-sim { flex: 1; }
 
 /* ───────────────────────── buttons ───────────────────────── */
 .btn {
