@@ -11,6 +11,13 @@ It listens while you play and shows you three things:
 You do **not** pick a flute key or a scale before you start. You just play, and the
 app proposes your Sa. You decide.
 
+> **On a phone?** Skip the local server: the app is published at
+> **<https://shubham22799.github.io/Flute-Riyaz/>**. Open that link, press
+> **Start microphone** (the browser asks once), and press **Start session** when
+> you want to record. It is the same code, served over https — which is what
+> phones require for microphone access. On iPhone, use Safari and add the page
+> to the Home Screen if you want it without browser chrome.
+
 ---
 
 ## Part 1 · Before your first note (2 minutes)

@@ -14,6 +14,11 @@ is ever uploaded anywhere.
 > walkthrough: what to do before your first note, how to set your Sa, and what you
 > can actually practise with this.
 
+> **Online version:** **<https://shubham22799.github.io/Flute-Riyaz/>** — the same
+> static files, published with GitHub Pages. It is served over **https**, so the
+> microphone works there (which `file://` pages usually do not). Open it on your
+> phone, press **Start microphone**, and practise.
+
 ---
 
 ## 1. Quick start
